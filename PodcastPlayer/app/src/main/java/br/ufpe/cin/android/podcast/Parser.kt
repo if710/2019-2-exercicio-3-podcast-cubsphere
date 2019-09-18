@@ -27,7 +27,7 @@ object Parser {
                 val tag = parser.name
                 //delimitando que estamos apenas interessados em tags <item>
                 if (tag == "item") {
-                    var title = ""
+                    var title: String
                     while (parser.next() != XmlPullParser.END_TAG) {
                         if (parser.eventType == XmlPullParser.START_TAG) {
                             val tagAberta = parser.name
@@ -99,6 +99,7 @@ object Parser {
         var link: String? = null
         var pubDate: String? = null
         var description: String? = null
+        var downloadLink: String? = null
         parser.require(XmlPullParser.START_TAG, null, "item")
         while (parser.next() != XmlPullParser.END_TAG) {
             if (parser.eventType != XmlPullParser.START_TAG) {
@@ -113,11 +114,26 @@ object Parser {
                 pubDate = readData(parser, "pubDate")
             } else if (name == "description") {
                 description = readData(parser, "description")
+            } else if (name == "enclosure") {
+                downloadLink = readURL(parser, "enclosure")
             } else {
                 skip(parser)
             }
         }
-        return ItemFeed(title!!, link!!, pubDate!!, description!!, "carregar o link")
+        if (downloadLink == null) {
+            downloadLink = link!!
+        }
+        return ItemFeed(title!!, link!!, pubDate!!, description!!, downloadLink)
+    }
+
+    //obtains the value for attribute "url" from a tag
+    @Throws(IOException::class, XmlPullParserException::class)
+    fun readURL(parser: XmlPullParser, tag: String): String {
+        parser.require(XmlPullParser.START_TAG, null, tag)
+        val url = parser.getAttributeValue(null, "url")
+        readText(parser)
+        parser.require(XmlPullParser.END_TAG, null, tag)
+        return url
     }
 
     // Processa tags de forma parametrizada no feed.
