@@ -1,10 +1,7 @@
 package br.ufpe.cin.android.podcast
 
 import androidx.lifecycle.LiveData
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
+import androidx.room.*
 
 @Dao
 interface ItemFeedDao {
@@ -19,4 +16,7 @@ interface ItemFeedDao {
 
     @Query("delete from item_feed")
     suspend fun deleteAll()
+
+    @Update
+    suspend fun update(itemFeed: ItemFeed)
 }

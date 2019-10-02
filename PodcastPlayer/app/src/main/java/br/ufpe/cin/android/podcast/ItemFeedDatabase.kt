@@ -14,10 +14,11 @@ abstract class ItemFeedDatabase : RoomDatabase() {
         private var INSTANCE: ItemFeedDatabase? = null
 
         fun getDatabase(context: Context): ItemFeedDatabase {
-            if (INSTANCE != null) {
-                return INSTANCE!!
-            }
             synchronized(this) {
+                if (INSTANCE != null) {
+                    return INSTANCE!!
+                }
+
                 INSTANCE = Room.databaseBuilder(
                     context.applicationContext,
                     ItemFeedDatabase::class.java,

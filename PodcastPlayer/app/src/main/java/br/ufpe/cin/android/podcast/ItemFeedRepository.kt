@@ -8,4 +8,8 @@ class ItemFeedRepository (private val itemFeedDao: ItemFeedDao) {
     suspend fun insert(itemFeed: ItemFeed) {
         itemFeedDao.insert(itemFeed)
     }
+
+    suspend fun update(itemFeed: ItemFeed) {
+        itemFeedDao.update(itemFeed)
+    }
 }

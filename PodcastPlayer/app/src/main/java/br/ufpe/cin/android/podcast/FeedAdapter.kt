@@ -2,8 +2,6 @@ package br.ufpe.cin.android.podcast
 
 import android.content.Context
 import android.content.Intent
-import android.content.Intent.ACTION_VIEW
-import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,7 +10,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
 
-class FeedAdapter (ctx: Context) : RecyclerView.Adapter<FeedAdapter.ViewHolder>() {
+class FeedAdapter (private val ctx: Context) : RecyclerView.Adapter<FeedAdapter.ViewHolder>() {
 
     class ViewHolder (itemView: View) : RecyclerView.ViewHolder(itemView), View.OnClickListener {
         private val itemTitle: TextView = itemView.findViewById(R.id.item_title)
@@ -21,23 +19,25 @@ class FeedAdapter (ctx: Context) : RecyclerView.Adapter<FeedAdapter.ViewHolder>(
         var itemFeed: ItemFeed? = null
 
         init {
-            button.text = "Download"
-
-            //send an intent to view the download link
-            button.setOnClickListener {
-                val intent = Intent()
-                intent.action = ACTION_VIEW
-                intent.data = Uri.parse(itemFeed!!.downloadLink)
-                it.context.startActivity(intent)
-            }
             itemView.setOnClickListener(this)
         }
 
         fun setTexts() {
             //set all text fields
             //cannot be done during init since init runs before the variable itemField is set by the adapter
+            button.text = "Download" + itemFeed!!.downloadStatus
             itemTitle.text = itemFeed!!.title
             itemDate.text = itemFeed!!.pubDate
+        }
+
+        fun setDownloadButtonAction() {
+            //send an intent to download the file
+            button.setOnClickListener {
+                val intent = Intent(button.context.applicationContext, DownloadEpisodeService::class.java)
+                intent.putExtra("title", itemFeed!!.title)
+                intent.putExtra("url", itemFeed!!.downloadLink)
+                button.context.applicationContext.startService(intent)
+            }
         }
 
         override fun onClick(p0: View?) {
@@ -67,6 +67,9 @@ class FeedAdapter (ctx: Context) : RecyclerView.Adapter<FeedAdapter.ViewHolder>(
         vh.itemFeed = feed[position]
         //set viewHolder's textFields
         vh.setTexts()
+        //set viewHolder's download button action
+        vh.setDownloadButtonAction()
+
     }
 
     fun setFeed(feed: List<ItemFeed>) {

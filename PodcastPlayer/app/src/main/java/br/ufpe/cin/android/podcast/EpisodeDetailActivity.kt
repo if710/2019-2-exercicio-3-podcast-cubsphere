@@ -2,11 +2,10 @@ package br.ufpe.cin.android.podcast
 
 import android.content.Intent
 import android.net.Uri
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.Html
+import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_episode_detail.*
-import kotlinx.android.synthetic.main.itemlista.*
 import kotlinx.android.synthetic.main.itemlista.item_date
 import kotlinx.android.synthetic.main.itemlista.item_title
 
