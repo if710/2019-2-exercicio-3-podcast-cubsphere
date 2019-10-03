@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">PodcastPlayer</string>>
-    <string name="action_download">DL</string>
+    <string name="action_download">DOWNLOAD</string>
+    <string name="play_button">Play button</string>
 </resources>

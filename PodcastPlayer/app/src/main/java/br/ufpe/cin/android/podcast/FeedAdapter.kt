@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.ImageButton
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
@@ -15,6 +16,7 @@ class FeedAdapter (private val ctx: Context) : RecyclerView.Adapter<FeedAdapter.
     class ViewHolder (itemView: View) : RecyclerView.ViewHolder(itemView), View.OnClickListener {
         private val itemTitle: TextView = itemView.findViewById(R.id.item_title)
         private val button: Button = itemView.findViewById(R.id.item_action)
+        private val playButton: ImageButton = itemView.findViewById(R.id.item_play)
         private val itemDate: TextView = itemView.findViewById(R.id.item_date)
         var itemFeed: ItemFeed? = null
 
@@ -25,12 +27,13 @@ class FeedAdapter (private val ctx: Context) : RecyclerView.Adapter<FeedAdapter.
         fun setTexts() {
             //set all text fields
             //cannot be done during init since init runs before the variable itemField is set by the adapter
-            button.text = "Download" + itemFeed!!.downloadStatus
             itemTitle.text = itemFeed!!.title
             itemDate.text = itemFeed!!.pubDate
         }
 
-        fun setDownloadButtonAction() {
+        private fun setDownloadButton() {
+            playButton.visibility = View.GONE
+            button.visibility = View.VISIBLE
             //send an intent to download the file
             button.setOnClickListener {
                 val intent = Intent(button.context.applicationContext, DownloadEpisodeService::class.java)
@@ -41,6 +44,19 @@ class FeedAdapter (private val ctx: Context) : RecyclerView.Adapter<FeedAdapter.
                 intent.putExtra("description", itemFeed!!.description)
                 intent.putExtra("downloadLink", itemFeed!!.downloadLink)
                 button.context.applicationContext.startService(intent)
+            }
+        }
+
+        private fun setPlayButton() {
+            button.visibility = View.GONE
+            playButton.visibility = View.VISIBLE
+        }
+
+        fun setButtons() {
+            when (itemFeed!!.downloadStatus) {
+                ItemFeed.DEFAULT -> setDownloadButton()
+                ItemFeed.DOWNLOADING -> setDownloadButton()
+                ItemFeed.FINISHED -> setPlayButton()
             }
         }
 
@@ -72,8 +88,7 @@ class FeedAdapter (private val ctx: Context) : RecyclerView.Adapter<FeedAdapter.
         //set viewHolder's textFields
         vh.setTexts()
         //set viewHolder's download button action
-        vh.setDownloadButtonAction()
-
+        vh.setButtons()
     }
 
     fun setFeed(feed: List<ItemFeed>) {
