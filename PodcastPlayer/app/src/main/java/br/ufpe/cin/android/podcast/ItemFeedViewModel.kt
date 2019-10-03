@@ -22,19 +22,16 @@ class ItemFeedViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
-    private fun getItemFeed(title: String): ItemFeed = itemFeeds.value!!.first { it.title == title }
-
     private fun update (itemFeed: ItemFeed, status: Int) = viewModelScope.launch {
         itemFeed.downloadStatus = status
         repo.update(itemFeed)
     }
 
-    fun updateToDefault(title: String) = update(getItemFeed(title), ItemFeed.DEFAULT)
+    fun updateToDefault(itemFeed: ItemFeed) = update(itemFeed, ItemFeed.DEFAULT)
 
-    fun updateToDownloading(title: String) = update(getItemFeed(title), ItemFeed.DOWNLOADING)
+    fun updateToDownloading(itemFeed: ItemFeed) = update(itemFeed, ItemFeed.DOWNLOADING)
 
-    fun updateToFinished(title: String, fileLocation: String) {
-        val itemFeed = getItemFeed(title)
+    fun updateToFinished(itemFeed: ItemFeed, fileLocation: String) {
         itemFeed.downloadLocation = fileLocation
         update(itemFeed, ItemFeed.FINISHED)
     }

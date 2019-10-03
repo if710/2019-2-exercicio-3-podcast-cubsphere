@@ -34,8 +34,12 @@ class FeedAdapter (private val ctx: Context) : RecyclerView.Adapter<FeedAdapter.
             //send an intent to download the file
             button.setOnClickListener {
                 val intent = Intent(button.context.applicationContext, DownloadEpisodeService::class.java)
+                //send all required information via extras
                 intent.putExtra("title", itemFeed!!.title)
-                intent.putExtra("url", itemFeed!!.downloadLink)
+                intent.putExtra("link", itemFeed!!.link)
+                intent.putExtra("pubDate", itemFeed!!.pubDate)
+                intent.putExtra("description", itemFeed!!.description)
+                intent.putExtra("downloadLink", itemFeed!!.downloadLink)
                 button.context.applicationContext.startService(intent)
             }
         }
