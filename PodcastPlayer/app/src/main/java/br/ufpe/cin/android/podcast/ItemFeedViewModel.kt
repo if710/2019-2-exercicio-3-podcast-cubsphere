@@ -31,8 +31,15 @@ class ItemFeedViewModel(app: Application) : AndroidViewModel(app) {
 
     fun updateToDownloading(itemFeed: ItemFeed) = update(itemFeed, ItemFeed.DOWNLOADING)
 
-    fun updateToFinished(itemFeed: ItemFeed, fileLocation: String) {
+    fun updateDownloadFinished(itemFeed: ItemFeed, fileLocation: String) {
         itemFeed.downloadLocation = fileLocation
-        update(itemFeed, ItemFeed.FINISHED)
+        update(itemFeed, ItemFeed.READY)
     }
+
+    fun updatePlay(itemFeed: ItemFeed) = update(itemFeed, ItemFeed.PLAYING)
+
+    fun updatePause(itemFeed: ItemFeed) = update(itemFeed, ItemFeed.READY)
+
+    fun unsetPlaying() = viewModelScope.launch { repo.unsetPlaying() }
+    fun unsetDownloading() = viewModelScope.launch { repo.unsetDownloading() }
 }

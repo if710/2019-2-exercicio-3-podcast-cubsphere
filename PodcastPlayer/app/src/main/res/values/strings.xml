@@ -2,4 +2,5 @@
     <string name="app_name">PodcastPlayer</string>>
     <string name="action_download">DOWNLOAD</string>
     <string name="play_button">Play button</string>
+    <string name="pause_button">Pause button</string>
 </resources>

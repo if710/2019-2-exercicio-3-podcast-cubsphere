@@ -3,6 +3,11 @@ package br.ufpe.cin.android.podcast
 import androidx.lifecycle.LiveData
 import androidx.room.*
 
+const val default = ItemFeed.DEFAULT
+const val downloading = ItemFeed.DOWNLOADING
+const val ready = ItemFeed.READY
+const val playing = ItemFeed.PLAYING
+
 @Dao
 interface ItemFeedDao {
     @Query("select * from item_feed order by pubDate desc")
@@ -19,4 +24,10 @@ interface ItemFeedDao {
 
     @Update
     suspend fun update(itemFeed: ItemFeed)
+
+    @Query("update item_feed set downloadStatus = $ready where downloadStatus == $playing")
+    suspend fun unsetPlaying()
+
+    @Query("update item_feed set downloadStatus = $default where downloadStatus == $downloading")
+    suspend fun unsetDownloading()
 }

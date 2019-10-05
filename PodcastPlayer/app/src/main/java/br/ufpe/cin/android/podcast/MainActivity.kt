@@ -16,6 +16,9 @@ class MainActivity : AppCompatActivity() {
     companion object {
         private val INTERNET_PERMISSIONS = arrayOf(Manifest.permission.INTERNET)
         private const val INTERNET_REQUEST = 710
+
+        private val FOREGROUND_PERMISSIONS = arrayOf(Manifest.permission.FOREGROUND_SERVICE)
+        private const val FOREGROUND_REQUEST = 711
     }
 
     private var viewModel: ItemFeedViewModel? = null
@@ -38,9 +41,14 @@ class MainActivity : AppCompatActivity() {
         //set view model to update the adapter with every modification to its underlying data
         viewModel = ViewModelProviders.of(this).get(ItemFeedViewModel::class.java)
         viewModel!!.itemFeeds.observe(this, Observer { feed -> feed?.let { feedAdapter.setFeed(feed) } })
+        viewModel!!.unsetPlaying()
+        viewModel!!.unsetDownloading()
 
         //initiate internet-related tasks
         handleInternet()
+
+        //request foreground permissions
+        handleForeground()
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
@@ -59,9 +67,18 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private var hasRequestedForegroundPreviously = false
+    private fun handleForeground() {
+        if (!hasForeground()) {
+            requestForeground()
+        }
+    }
+
     private fun hasInternet() = Manifest.permission.INTERNET.hasPermission()
+    private fun hasForeground() = Manifest.permission.FOREGROUND_SERVICE.hasPermission()
 
     private fun requestInternet() = ActivityCompat.requestPermissions(this, INTERNET_PERMISSIONS, INTERNET_REQUEST)
+    private fun requestForeground() = ActivityCompat.requestPermissions(this, FOREGROUND_PERMISSIONS, FOREGROUND_REQUEST)
 
     private fun downloadData() = DownloadTask(viewModel!!).execute(resourceURL)
 

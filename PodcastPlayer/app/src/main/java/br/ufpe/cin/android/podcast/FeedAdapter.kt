@@ -2,23 +2,32 @@ package br.ufpe.cin.android.podcast
 
 import android.content.Context
 import android.content.Intent
+import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageButton
+import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
 
-class FeedAdapter (private val ctx: Context) : RecyclerView.Adapter<FeedAdapter.ViewHolder>() {
+class FeedAdapter (ctx: Context) : RecyclerView.Adapter<FeedAdapter.ViewHolder>() {
 
     class ViewHolder (itemView: View) : RecyclerView.ViewHolder(itemView), View.OnClickListener {
         private val itemTitle: TextView = itemView.findViewById(R.id.item_title)
-        private val button: Button = itemView.findViewById(R.id.item_action)
+        private val downloadButton: Button = itemView.findViewById(R.id.item_action)
+        private val downloadingIcon: ProgressBar = itemView.findViewById(R.id.item_loading)
         private val playButton: ImageButton = itemView.findViewById(R.id.item_play)
+        private val pauseButton: ImageButton = itemView.findViewById(R.id.item_pause)
         private val itemDate: TextView = itemView.findViewById(R.id.item_date)
         var itemFeed: ItemFeed? = null
+        var index = -2
+
+        companion object {
+            var playingIndex = -1
+        }
 
         init {
             itemView.setOnClickListener(this)
@@ -31,32 +40,55 @@ class FeedAdapter (private val ctx: Context) : RecyclerView.Adapter<FeedAdapter.
             itemDate.text = itemFeed!!.pubDate
         }
 
-        private fun setDownloadButton() {
+        private fun setVisible(view: View) {
+            downloadButton.visibility = View.GONE
+            downloadingIcon.visibility = View.GONE
+            pauseButton.visibility = View.GONE
             playButton.visibility = View.GONE
-            button.visibility = View.VISIBLE
-            //send an intent to download the file
-            button.setOnClickListener {
-                val intent = Intent(button.context.applicationContext, DownloadEpisodeService::class.java)
+            view.visibility = View.VISIBLE
+        }
+
+        private fun setDownloadButton() {
+            setVisible(downloadButton)
+            downloadButton.setOnClickListener {
+                //send an intent to download the file
+                val intent = Intent(downloadButton.context.applicationContext, DownloadEpisodeService::class.java)
                 //send all required information via extras
-                intent.putExtra("title", itemFeed!!.title)
-                intent.putExtra("link", itemFeed!!.link)
-                intent.putExtra("pubDate", itemFeed!!.pubDate)
-                intent.putExtra("description", itemFeed!!.description)
-                intent.putExtra("downloadLink", itemFeed!!.downloadLink)
-                button.context.applicationContext.startService(intent)
+                itemFeed!!.placeIntoIntent(intent)
+                downloadButton.context.applicationContext.startService(intent)
             }
         }
 
+        private fun setDownloading() = setVisible(downloadingIcon)
+
         private fun setPlayButton() {
-            button.visibility = View.GONE
-            playButton.visibility = View.VISIBLE
+            setVisible(playButton)
+            playButton.setOnClickListener {
+                //send an intent requesting a service to play this audio
+                val intent = Intent(playButton.context.applicationContext, MediaControllerService::class.java)
+                itemFeed!!.placeIntoIntent(intent)
+                intent.action = MediaControllerService.ACTION_PLAY
+                playButton.context.applicationContext.startForegroundService(intent)
+            }
+        }
+
+        private fun setPauseButton() {
+            setVisible(pauseButton)
+            pauseButton.setOnClickListener {
+                //send an intent requesting a service to play this audio
+                val intent = Intent(playButton.context.applicationContext, MediaControllerService::class.java)
+                itemFeed!!.placeIntoIntent(intent)
+                intent.action = MediaControllerService.ACTION_PAUSE
+                playButton.context.applicationContext.startForegroundService(intent)
+            }
         }
 
         fun setButtons() {
             when (itemFeed!!.downloadStatus) {
                 ItemFeed.DEFAULT -> setDownloadButton()
-                ItemFeed.DOWNLOADING -> setDownloadButton()
-                ItemFeed.FINISHED -> setPlayButton()
+                ItemFeed.DOWNLOADING -> setDownloading()
+                ItemFeed.READY -> setPlayButton()
+                ItemFeed.PLAYING -> setPauseButton()
             }
         }
 
@@ -89,6 +121,8 @@ class FeedAdapter (private val ctx: Context) : RecyclerView.Adapter<FeedAdapter.
         vh.setTexts()
         //set viewHolder's download button action
         vh.setButtons()
+        //set viewHolder's index
+        vh.index = position
     }
 
     fun setFeed(feed: List<ItemFeed>) {
