@@ -12,24 +12,21 @@ class DownloadTask(private val viewModel: ItemFeedViewModel): AsyncTask<String, 
         //launches a coroutine in global scope
         //this is OK since this is a top-level coroutine operating on the whole application lifetime and is never cancelled
         GlobalScope.launch{
-            //permanently re-fetches data to get any updates to the feed
-            loop@ while(true) {
-                val (_, _, result) = params[0]
-                    .httpGet()
-                    .responseString()
+            val (_, _, result) = params[0]
+                .httpGet()
+                .responseString()
 
-                when (result) {
-                    is Result.Failure -> {
-                        failAwait()
-                        continue@loop
-                    }
-                    is Result.Success -> {
-                        //updates data
-                        viewModel.insertAll(Parser.parse(result.value))
-                        successAwait()
-                        resetBackoff()
-                        continue@loop
-                    }
+            when (result) {
+                is Result.Failure -> {
+                    failAwait()
+                   // continue@loop
+                }
+                is Result.Success -> {
+                    //updates data
+                    viewModel.insertAll(Parser.parse(result.value))
+                    successAwait()
+                    resetBackoff()
+                //    continue@loop
                 }
             }
         }

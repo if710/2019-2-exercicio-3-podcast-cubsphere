@@ -10,6 +10,10 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
+import java.util.concurrent.TimeUnit
 
 class MainActivity : AppCompatActivity() {
 
@@ -44,6 +48,8 @@ class MainActivity : AppCompatActivity() {
         viewModel!!.unsetPlaying()
         viewModel!!.unsetDownloading()
 
+        DownloadFeedWorker.setViewModelAndUrl(viewModel!!, resourceURL)
+
         //initiate internet-related tasks
         handleInternet()
 
@@ -71,6 +77,9 @@ class MainActivity : AppCompatActivity() {
     private fun handleForeground() {
         if (!hasForeground()) {
             requestForeground()
+        } else if (!hasRequestedForegroundPreviously) {
+            hasRequestedForegroundPreviously = true
+            requestForeground()
         }
     }
 
@@ -80,7 +89,18 @@ class MainActivity : AppCompatActivity() {
     private fun requestInternet() = ActivityCompat.requestPermissions(this, INTERNET_PERMISSIONS, INTERNET_REQUEST)
     private fun requestForeground() = ActivityCompat.requestPermissions(this, FOREGROUND_PERMISSIONS, FOREGROUND_REQUEST)
 
-    private fun downloadData() = DownloadTask(viewModel!!).execute(resourceURL)
+    private fun downloadData() {
+        val duration = getDurationFromPreferences()
+        val periodicWorkRequest = PeriodicWorkRequestBuilder<DownloadFeedWorker>(duration, TimeUnit.MILLISECONDS).build()
+        WorkManager.getInstance(this).enqueueUniquePeriodicWork(
+            "br.ufpe.cin.android.podcast.cubsphere.download-feed",
+            ExistingPeriodicWorkPolicy.REPLACE,
+            periodicWorkRequest)
+    }
+
+    private fun getDurationFromPreferences(): Long {
+        return 10000
+    }
 
     private fun String.hasPermission(): Boolean =
         PackageManager.PERMISSION_GRANTED == ContextCompat.checkSelfPermission(this@MainActivity,this)
