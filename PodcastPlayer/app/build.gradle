@@ -72,6 +72,9 @@ dependencies {
     implementation "androidx.preference:preference:$pref_version"
     implementation "androidx.preference:preference-ktx:$pref_version"
 
+    // LocalBroadcastManager
+    implementation 'androidx.localbroadcastmanager:localbroadcastmanager:1.0.0'
+
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:runner:1.2.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'

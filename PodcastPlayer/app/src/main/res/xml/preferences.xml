@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <SeekBarPreference
+        app:key="download_interval"
+        app:title="Interval between checks for updates"
+        app:defaultValue="10"
+        app:showSeekBarValue="true"/>
+
+</PreferenceScreen>

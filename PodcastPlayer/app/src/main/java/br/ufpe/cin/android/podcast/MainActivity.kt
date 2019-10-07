@@ -1,6 +1,10 @@
 package br.ufpe.cin.android.podcast
 
 import android.Manifest
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
@@ -8,6 +12,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.work.ExistingPeriodicWorkPolicy
@@ -23,6 +28,7 @@ class MainActivity : AppCompatActivity() {
 
         private val FOREGROUND_PERMISSIONS = arrayOf(Manifest.permission.FOREGROUND_SERVICE)
         private const val FOREGROUND_REQUEST = 711
+        const val DOWNLOAD_FINISHED_ACTION = "br.ufpe.cin.android.podcast.cin.cubsphere.dlfinished"
     }
 
     private var viewModel: ItemFeedViewModel? = null
@@ -55,6 +61,24 @@ class MainActivity : AppCompatActivity() {
 
         //request foreground permissions
         handleForeground()
+
+        //initiate listener for episode download completion
+        val lbm = LocalBroadcastManager.getInstance(this)
+        val filter = IntentFilter(DOWNLOAD_FINISHED_ACTION)
+        lbm.registerReceiver(broadcastReceiver, filter)
+    }
+
+    private val broadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            val itemFeed = ItemFeed.fromIntent(intent!!)
+            val downloadLocation = intent.getStringExtra("downloadLocation")
+            viewModel!!.updateDownloadFinished(itemFeed, downloadLocation!!)
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        unregisterReceiver(broadcastReceiver)
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {

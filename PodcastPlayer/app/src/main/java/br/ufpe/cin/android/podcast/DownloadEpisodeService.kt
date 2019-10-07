@@ -3,15 +3,12 @@ package br.ufpe.cin.android.podcast
 import android.app.IntentService
 import android.content.Intent
 import android.net.Uri
-import android.os.Debug
-import android.os.Looper
-import android.widget.Toast
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.github.kittinunf.fuel.httpGet
 import com.github.kittinunf.result.Result
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.io.File
-import java.util.logging.Logger
 
 const val mediaSubdirectory = "media/"
 
@@ -52,9 +49,18 @@ class DownloadEpisodeService : IntentService(DownloadEpisodeService::class.simpl
                     val writeTo = File(mediaFile, fileLocation)
                     writeTo.createNewFile()
                     writeTo.writeBytes(data)
-                    viewModel.updateDownloadFinished(itemFeed, writeTo.canonicalPath)
+                    broadcastDownloadComplete(itemFeed, writeTo.canonicalPath)
                 }
             }
         }
+    }
+
+    private fun broadcastDownloadComplete(itemFeed: ItemFeed, downloadLocation: String) {
+        val lbm = LocalBroadcastManager.getInstance(applicationContext)
+        val action = MainActivity.DOWNLOAD_FINISHED_ACTION
+        val intent = Intent(action)
+        itemFeed.placeIntoIntent(intent)
+        intent.putExtra("downloadLocation", downloadLocation)
+        lbm.sendBroadcast(intent)
     }
 }

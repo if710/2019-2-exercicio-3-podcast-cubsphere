@@ -2,7 +2,6 @@ package br.ufpe.cin.android.podcast
 
 import android.content.Context
 import android.content.Intent
-import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -26,7 +25,6 @@ class FeedAdapter (ctx: Context) : RecyclerView.Adapter<FeedAdapter.ViewHolder>(
         var index = -2
 
         companion object {
-            var playingIndex = -1
         }
 
         init {
