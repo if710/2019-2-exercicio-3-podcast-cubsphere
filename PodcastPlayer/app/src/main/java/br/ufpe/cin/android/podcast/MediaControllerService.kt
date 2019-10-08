@@ -96,6 +96,11 @@ class MediaControllerService : IntentService(MediaControllerService::class.java.
         if (mediaPlayer == null) {
             val uri = Uri.parse(itemFeed.downloadLocation)!!
             mediaPlayer = MediaPlayer.create(applicationContext, uri)
+            mediaPlayer!!.setOnCompletionListener {
+                viewModel.updatePlaybackComplete(itemFeed!!)
+                prevItemFeed = null
+                mediaPlayer!!.reset()
+            }
         } else {
             mediaPlayer?.setDataSource(itemFeed.downloadLocation)
             mediaPlayer?.prepare()

@@ -5,6 +5,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
+import java.io.File
 
 class ItemFeedViewModel(app: Application) : AndroidViewModel(app) {
     private val repo: ItemFeedRepository
@@ -41,6 +42,13 @@ class ItemFeedViewModel(app: Application) : AndroidViewModel(app) {
     fun updatePause(itemFeed: ItemFeed, pauseTime: Int) {
         itemFeed.pauseTime = pauseTime
         update(itemFeed, ItemFeed.READY)
+    }
+
+    fun updatePlaybackComplete(itemFeed: ItemFeed) {
+        itemFeed.pauseTime = 0
+        File(itemFeed.downloadLocation).delete()
+        itemFeed.downloadLocation = ""
+        update(itemFeed, ItemFeed.DEFAULT)
     }
 
     fun unsetPlaying() = viewModelScope.launch { repo.unsetPlaying() }
