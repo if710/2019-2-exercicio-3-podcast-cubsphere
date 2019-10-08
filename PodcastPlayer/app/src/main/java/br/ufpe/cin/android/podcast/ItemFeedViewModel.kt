@@ -23,27 +23,35 @@ class ItemFeedViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
+    //set an ItemFeed to a specified status
     private fun update (itemFeed: ItemFeed, status: Int) = viewModelScope.launch {
         itemFeed.downloadStatus = status
         repo.update(itemFeed)
     }
 
+    //set an ItemFeed to its default status
     fun updateToDefault(itemFeed: ItemFeed) = update(itemFeed, ItemFeed.DEFAULT)
 
+    //set an ItemFeed to a downloading status
     fun updateToDownloading(itemFeed: ItemFeed) = update(itemFeed, ItemFeed.DOWNLOADING)
 
+    //set an ItemFeed to downloaded status, indicating its media file is downloaded and ready to play
+    //also set the path to that ItemFeed's media on local storage
     fun updateDownloadFinished(itemFeed: ItemFeed, fileLocation: String) {
         itemFeed.downloadLocation = fileLocation
         update(itemFeed, ItemFeed.READY)
     }
 
+    //set an ItemFeed to a playing status, indicating the media is currently playing
     fun updatePlay(itemFeed: ItemFeed) = update(itemFeed, ItemFeed.PLAYING)
 
+    //set an ItemFeed to a paused status, and record the time of pause
     fun updatePause(itemFeed: ItemFeed, pauseTime: Int) {
         itemFeed.pauseTime = pauseTime
         update(itemFeed, ItemFeed.READY)
     }
 
+    //delete an ItemFeed's local file, and reset its status to match
     fun updatePlaybackComplete(itemFeed: ItemFeed) {
         itemFeed.pauseTime = 0
         File(itemFeed.downloadLocation).delete()

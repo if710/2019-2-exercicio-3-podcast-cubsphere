@@ -24,6 +24,8 @@ data class ItemFeed(
         const val DOWNLOADING = 1
         const val READY = 2
         const val PLAYING = 3
+
+        //extract relevant data from an Intent into an ItemFeed
         fun fromIntent(intent: Intent) : ItemFeed {
             return ItemFeed(
                 title = intent.getStringExtra("title")!!,
@@ -38,6 +40,7 @@ data class ItemFeed(
         }
     }
 
+    //pack relevant data from an ItemFeed into an Intent
     fun placeIntoIntent(intent: Intent) {
         intent.putExtra("title", title)
         intent.putExtra("link", link)

@@ -1,4 +1,4 @@
-# IF710 2019.2 - Exercício 3 - Podcast Player
+﻿# IF710 2019.2 - Exercício 3 - Podcast Player
 
 Esta tarefa envolve os conceitos de `Service`, `BroadcastReceiver`, `SystemServices` e princípios de UI. 
 Siga os passos na ordem sugerida abaixo e identifique quais os passos completados no seu repositório. 
@@ -29,8 +29,8 @@ Este exercício é baseado no [exercício anterior](https://github.com/if710/201
 | ------ | ------ |
 | 7 | **sim** |
 | 8 | **sim** |
-| 9 | **sim** |
-| 10 | **parcial** |
+| 9 | **parcial** | (uso de Notification e ForegroundService, mas a notificação não controla o playback)
+| 10 | **parcial** | (uso de PeriodicWork, mas não há sistema de preferências)
 | 11 | **sim** |
 | 12 | **sim** |
 | 13 | **sim** |

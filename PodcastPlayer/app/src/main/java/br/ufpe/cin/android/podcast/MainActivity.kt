@@ -51,9 +51,13 @@ class MainActivity : AppCompatActivity() {
         //set view model to update the adapter with every modification to its underlying data
         viewModel = ViewModelProviders.of(this).get(ItemFeedViewModel::class.java)
         viewModel!!.itemFeeds.observe(this, Observer { feed -> feed?.let { feedAdapter.setFeed(feed) } })
+
+        //reset downloading or playing status
+        //this is necessary in case these tasks were initiated but aborted by terminating the app
         viewModel!!.unsetPlaying()
         viewModel!!.unsetDownloading()
 
+        //set viewmodel and URL to the podcast for the worker to operate with
         DownloadFeedWorker.setViewModelAndUrl(viewModel!!, resourceURL)
 
         //initiate internet-related tasks
@@ -62,13 +66,15 @@ class MainActivity : AppCompatActivity() {
         //request foreground permissions
         handleForeground()
 
-        //initiate listener for episode download completion
+        //register listener for episode download completion
         val lbm = LocalBroadcastManager.getInstance(this)
         val filter = IntentFilter(DOWNLOAD_FINISHED_ACTION)
         lbm.registerReceiver(broadcastReceiver, filter)
     }
 
     private val broadcastReceiver = object : BroadcastReceiver() {
+
+        //perform necessary operations to register the feed's download
         override fun onReceive(context: Context?, intent: Intent?) {
             val itemFeed = ItemFeed.fromIntent(intent!!)
             val filepath = intent.getStringExtra("filepath")!!
@@ -115,7 +121,9 @@ class MainActivity : AppCompatActivity() {
 
     private fun downloadData() {
         val duration = getDurationFromPreferences()
+        //use a periodic work request to update the feed repeatedly at set intervals
         val periodicWorkRequest = PeriodicWorkRequestBuilder<DownloadFeedWorker>(duration, TimeUnit.MILLISECONDS).build()
+        //enqueue the periodic work request
         WorkManager.getInstance(this).enqueueUniquePeriodicWork(
             "br.ufpe.cin.android.podcast.cubsphere.download-feed",
             ExistingPeriodicWorkPolicy.REPLACE,

@@ -22,10 +22,6 @@ class FeedAdapter (ctx: Context) : RecyclerView.Adapter<FeedAdapter.ViewHolder>(
         private val pauseButton: ImageButton = itemView.findViewById(R.id.item_pause)
         private val itemDate: TextView = itemView.findViewById(R.id.item_date)
         var itemFeed: ItemFeed? = null
-        var index = -2
-
-        companion object {
-        }
 
         init {
             itemView.setOnClickListener(this)
@@ -38,6 +34,7 @@ class FeedAdapter (ctx: Context) : RecyclerView.Adapter<FeedAdapter.ViewHolder>(
             itemDate.text = itemFeed!!.pubDate
         }
 
+        //set a specific view as visible, and all others as gone
         private fun setVisible(view: View) {
             downloadButton.visibility = View.GONE
             downloadingIcon.visibility = View.GONE
@@ -57,12 +54,14 @@ class FeedAdapter (ctx: Context) : RecyclerView.Adapter<FeedAdapter.ViewHolder>(
             }
         }
 
+        //show only a spinning download indicator
         private fun setDownloading() = setVisible(downloadingIcon)
 
         private fun setPlayButton() {
+            //show only the play button
             setVisible(playButton)
+            //send an intent requesting a service to play this audio
             playButton.setOnClickListener {
-                //send an intent requesting a service to play this audio
                 val intent = Intent(playButton.context.applicationContext, MediaControllerService::class.java)
                 itemFeed!!.placeIntoIntent(intent)
                 intent.action = MediaControllerService.ACTION_PLAY
@@ -71,9 +70,10 @@ class FeedAdapter (ctx: Context) : RecyclerView.Adapter<FeedAdapter.ViewHolder>(
         }
 
         private fun setPauseButton() {
+            //show only the pause button
             setVisible(pauseButton)
+            //send an intent requesting a service to pause this audio
             pauseButton.setOnClickListener {
-                //send an intent requesting a service to play this audio
                 val intent = Intent(playButton.context.applicationContext, MediaControllerService::class.java)
                 itemFeed!!.placeIntoIntent(intent)
                 intent.action = MediaControllerService.ACTION_PAUSE
@@ -82,6 +82,7 @@ class FeedAdapter (ctx: Context) : RecyclerView.Adapter<FeedAdapter.ViewHolder>(
         }
 
         fun setButtons() {
+            //set buttons for this ItemFeed according to its status
             when (itemFeed!!.downloadStatus) {
                 ItemFeed.DEFAULT -> setDownloadButton()
                 ItemFeed.DOWNLOADING -> setDownloading()
@@ -119,8 +120,6 @@ class FeedAdapter (ctx: Context) : RecyclerView.Adapter<FeedAdapter.ViewHolder>(
         vh.setTexts()
         //set viewHolder's download button action
         vh.setButtons()
-        //set viewHolder's index
-        vh.index = position
     }
 
     fun setFeed(feed: List<ItemFeed>) {

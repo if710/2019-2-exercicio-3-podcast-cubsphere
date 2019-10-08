@@ -24,6 +24,7 @@ class DownloadFeedWorker(ctx: Context, params: WorkerParameters) : Worker(ctx, p
 
         return when (result) {
             is com.github.kittinunf.result.Result.Success -> {
+                //update the viewModel with all new items fetched
                 viewModel!!.insertAll(Parser.parse(result.value))
                 Result.success()
             }
