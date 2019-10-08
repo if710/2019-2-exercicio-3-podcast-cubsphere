@@ -38,7 +38,10 @@ class ItemFeedViewModel(app: Application) : AndroidViewModel(app) {
 
     fun updatePlay(itemFeed: ItemFeed) = update(itemFeed, ItemFeed.PLAYING)
 
-    fun updatePause(itemFeed: ItemFeed) = update(itemFeed, ItemFeed.READY)
+    fun updatePause(itemFeed: ItemFeed, pauseTime: Int) {
+        itemFeed.pauseTime = pauseTime
+        update(itemFeed, ItemFeed.READY)
+    }
 
     fun unsetPlaying() = viewModelScope.launch { repo.unsetPlaying() }
     fun unsetDownloading() = viewModelScope.launch { repo.unsetDownloading() }

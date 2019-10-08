@@ -15,7 +15,8 @@ data class ItemFeed(
     val description: String,
     val downloadLink: String,
     var downloadStatus: Int = DEFAULT,
-    var downloadLocation: String = ""
+    var downloadLocation: String = "",
+    var pauseTime: Int = 0
 ) {
     companion object {
         const val INVALID = -1
@@ -31,7 +32,8 @@ data class ItemFeed(
                 description = intent.getStringExtra("description")!!,
                 downloadLink = intent.getStringExtra("downloadLink")!!,
                 downloadStatus = intent.getIntExtra("downloadStatus", INVALID),
-                downloadLocation = intent.getStringExtra("downloadLocation")!!
+                downloadLocation = intent.getStringExtra("downloadLocation")!!,
+                pauseTime = intent.getIntExtra("pauseTime", 0)
             )
         }
     }
@@ -44,6 +46,7 @@ data class ItemFeed(
         intent.putExtra("downloadLink", downloadLink)
         intent.putExtra("downloadStatus", downloadStatus)
         intent.putExtra("downloadLocation", downloadLocation)
+        intent.putExtra("pauseTime", pauseTime)
     }
 
     override fun toString(): String {

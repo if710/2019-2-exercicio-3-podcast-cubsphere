@@ -71,8 +71,8 @@ class MainActivity : AppCompatActivity() {
     private val broadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             val itemFeed = ItemFeed.fromIntent(intent!!)
-            val downloadLocation = intent.getStringExtra("downloadLocation")
-            viewModel!!.updateDownloadFinished(itemFeed, downloadLocation!!)
+            val filepath = intent.getStringExtra("filepath")!!
+            viewModel!!.updateDownloadFinished(itemFeed, filepath)
         }
     }
 

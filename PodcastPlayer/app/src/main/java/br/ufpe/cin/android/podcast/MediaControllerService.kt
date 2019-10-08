@@ -62,6 +62,7 @@ class MediaControllerService : IntentService(MediaControllerService::class.java.
 
         mediaPlayer!!.start()
         if (mediaPlayer!!.isPlaying) {
+            mediaPlayer!!.seekTo(itemFeed.pauseTime)
             viewModel.updatePlay(itemFeed)
             prevItemFeed = itemFeed
         }
@@ -79,14 +80,14 @@ class MediaControllerService : IntentService(MediaControllerService::class.java.
         if (mediaPlayer != null && mediaPlayer!!.isPlaying) {
             mediaPlayer!!.pause()
             if (!mediaPlayer!!.isPlaying){
-                viewModel.updatePause(itemFeed)
+                viewModel.updatePause(itemFeed, mediaPlayer!!.currentPosition)
             }
         }
     }
 
     private fun discardPrevious() {
         if (prevItemFeed != null) {
-            viewModel.updatePause(prevItemFeed!!)
+            viewModel.updatePause(prevItemFeed!!, mediaPlayer!!.currentPosition)
         }
         mediaPlayer?.reset()
     }

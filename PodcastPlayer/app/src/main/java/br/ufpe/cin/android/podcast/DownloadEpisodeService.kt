@@ -55,12 +55,12 @@ class DownloadEpisodeService : IntentService(DownloadEpisodeService::class.simpl
         }
     }
 
-    private fun broadcastDownloadComplete(itemFeed: ItemFeed, downloadLocation: String) {
+    private fun broadcastDownloadComplete(itemFeed: ItemFeed, filepath: String) {
         val lbm = LocalBroadcastManager.getInstance(applicationContext)
         val action = MainActivity.DOWNLOAD_FINISHED_ACTION
         val intent = Intent(action)
         itemFeed.placeIntoIntent(intent)
-        intent.putExtra("downloadLocation", downloadLocation)
+        intent.putExtra("filepath", filepath)
         lbm.sendBroadcast(intent)
     }
 }
